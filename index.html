@@ -1,1 +1,296 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Migração NovoTnfe</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F4F8FF; min-height: 100vh; }
+.topbar { background: #1565C0; padding: 18px 24px; }
+.topbar-tagline { font-size: 15px; color: #B5D4F4; font-weight: 400; line-height: 1.5; }
+.topbar-tagline strong { color: #ffffff; font-weight: 500; }
+.topbar-date { font-size: 12px; color: #7EB3E8; margin-top: 4px; }
+.body { padding: 24px 24px 32px; max-width: 860px; margin: 0 auto; }
+.cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: #fff; border-radius: 12px; border: 0.5px solid #DDE8F5; padding: 16px 18px; }
+.stat-card .slabel { font-size: 12px; color: #7A90A4; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.05em; }
+.stat-card .sval { font-size: 30px; font-weight: 500; }
+.sval.blue { color: #1565C0; }
+.sval.green { color: #2E7D32; }
+.sval.orange { color: #E65100; }
+.bar-card { background: #fff; border-radius: 12px; border: 0.5px solid #DDE8F5; padding: 16px 18px; margin-bottom: 20px; }
+.bar-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.bar-row span { font-size: 13px; color: #3A5068; }
+.bar-row strong { font-size: 20px; font-weight: 500; color: #1565C0; }
+.bar-bg { background: #E3F0FF; border-radius: 999px; height: 12px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 999px; background: #43A047; transition: width 0.6s ease; }
+.tabs { display: flex; margin-bottom: 14px; background: #fff; border: 0.5px solid #DDE8F5; border-radius: 10px; overflow: hidden; }
+.tab { flex: 1; padding: 10px 14px; font-size: 14px; font-family: inherit; border: none; cursor: pointer; background: transparent; color: #7A90A4; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+.tab:not(:last-child) { border-right: 0.5px solid #DDE8F5; }
+.tab.active { background: #1565C0; color: #fff; font-weight: 500; }
+.search-input { width: 100%; height: 38px; padding: 0 14px; background: #fff; border: 0.5px solid #DDE8F5; border-radius: 8px; font-size: 14px; color: #0D2340; outline: none; font-family: inherit; margin-bottom: 12px; }
+.search-input::placeholder { color: #7A90A4; }
+.list-box { background: #fff; border-radius: 12px; border: 0.5px solid #DDE8F5; overflow: hidden; min-height: 80px; }
+.list-row { display: flex; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid #DDE8F5; font-size: 14px; color: #0D2340; gap: 10px; }
+.list-row:last-child { border-bottom: none; }
+.badge-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.dot-blue { background: #378ADD; }
+.dot-green { background: #43A047; }
+.empty-state { padding: 28px; text-align: center; font-size: 14px; color: #7A90A4; }
+.timestamp { font-size: 12px; color: #7A90A4; text-align: right; margin-top: 12px; display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
+.ts-dot { width: 7px; height: 7px; border-radius: 50%; background: #43A047; }
+.divider { border: none; border-top: 0.5px solid #DDE8F5; margin: 20px 0; }
+.adm-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #7A90A4; cursor: pointer; user-select: none; margin-bottom: 14px; }
+.adm-toggle:hover { color: #1565C0; }
+.adm-panel { background: #fff; border-radius: 12px; border: 0.5px solid #DDE8F5; padding: 20px; }
+.adm-panel h2 { font-size: 16px; font-weight: 500; color: #0D2340; margin-bottom: 4px; }
+.adm-panel > p { font-size: 13px; color: #7A90A4; margin-bottom: 16px; }
+.pin-row { display: flex; gap: 8px; }
+.pin-row input { flex: 1; height: 36px; padding: 0 12px; border: 0.5px solid #DDE8F5; border-radius: 8px; font-size: 14px; outline: none; font-family: inherit; }
+.btn { padding: 9px 18px; border-radius: 8px; border: 0.5px solid #B5D4F4; font-size: 13px; cursor: pointer; font-family: inherit; background: #fff; color: #1565C0; font-weight: 500; transition: background 0.15s; }
+.btn:hover { background: #E3F0FF; }
+.btn-blue { background: #1565C0; color: #fff; border-color: #1565C0; }
+.btn-blue:hover { background: #0D47A1; }
+.btn-green { background: #E8F5E9; color: #2E7D32; border-color: #A5D6A7; }
+.btn-green:hover { background: #C8E6C9; }
+.locked { opacity: 0.3; pointer-events: none; }
+.adm-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
+.adm-list-box { border: 0.5px solid #DDE8F5; border-radius: 10px; overflow: hidden; background: #F4F8FF; }
+.adm-list-head { padding: 10px 14px; background: #fff; border-bottom: 0.5px solid #DDE8F5; display: flex; align-items: center; gap: 8px; }
+.adm-list-head span { font-size: 13px; font-weight: 500; color: #3A5068; flex: 1; }
+.adm-count { background: #E3F0FF; color: #1565C0; font-size: 11px; padding: 2px 8px; border-radius: 999px; font-weight: 500; }
+.adm-count.green { background: #E8F5E9; color: #2E7D32; }
+.add-row { display: flex; gap: 6px; padding: 10px 12px; background: #fff; border-bottom: 0.5px solid #DDE8F5; }
+.add-row input { flex: 1; font-size: 13px; height: 32px; padding: 0 10px; border: 0.5px solid #DDE8F5; border-radius: 6px; outline: none; font-family: inherit; }
+.add-row .btn { padding: 6px 12px; }
+.adm-scroll { max-height: 220px; overflow-y: auto; }
+.adm-item { display: flex; align-items: center; padding: 9px 12px; border-bottom: 0.5px solid #DDE8F5; font-size: 13px; color: #0D2340; gap: 8px; }
+.adm-item:last-child { border-bottom: none; }
+.adm-item .iname { flex: 1; }
+.adm-item button { padding: 3px 9px; font-size: 12px; border-radius: 6px; border: 0.5px solid #DDE8F5; background: transparent; cursor: pointer; color: #7A90A4; font-family: inherit; }
+.adm-item button:hover { background: #FFEBEE; color: #C62828; border-color: #FFCDD2; }
+@media (max-width: 500px) {
+  .cards { grid-template-columns: 1fr 1fr; }
+  .adm-lists { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
 
+<div class="topbar">
+  <div class="topbar-tagline">
+    Acompanhe em tempo real o <strong>Avanço</strong> da migração para o <strong>NovoTnfe</strong>
+  </div>
+  <div class="topbar-date" id="topbar-date"></div>
+</div>
+
+<div class="body">
+  <div class="cards">
+    <div class="stat-card">
+      <div class="slabel">Total de lojas</div>
+      <div class="sval blue" id="total-display">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="slabel">Migradas</div>
+      <div class="sval green" id="done-display">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="slabel">Pendentes</div>
+      <div class="sval orange" id="pending-display">—</div>
+    </div>
+  </div>
+
+  <div class="bar-card">
+    <div class="bar-row">
+      <span>Progresso geral da migração</span>
+      <strong id="pct-display">0%</strong>
+    </div>
+    <div class="bar-bg"><div class="bar-fill" id="bar" style="width:0%"></div></div>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('pendentes')" id="tab-pendentes">
+      <i class="ti ti-clock"></i> Pendentes
+    </button>
+    <button class="tab" onclick="switchTab('migrados')" id="tab-migrados">
+      <i class="ti ti-circle-check"></i> Migrados
+    </button>
+  </div>
+
+  <input type="text" class="search-input" id="search-input" placeholder="Buscar cliente pelo nome..." oninput="renderList()" />
+
+  <div class="list-box" id="list-view"></div>
+  <div class="timestamp" id="last-update"></div>
+
+  <div class="divider"></div>
+
+  <div class="adm-toggle" id="toggle-admin">
+    <i class="ti ti-settings"></i>
+    <span>Área administrativa</span>
+    <i class="ti ti-chevron-down" id="chevron"></i>
+  </div>
+
+  <div id="admin-area" style="display:none">
+    <div class="adm-panel">
+      <h2>Painel de controle</h2>
+      <p>Informe o PIN para liberar os controles.</p>
+      <div id="pin-section">
+        <div class="pin-row">
+          <input type="password" id="pin-input" placeholder="PIN de acesso" onkeydown="if(event.key==='Enter')checkPin()" />
+          <button class="btn btn-blue" onclick="checkPin()">Entrar</button>
+        </div>
+        <div style="font-size:12px;color:#C62828;display:none;margin-top:6px" id="pin-error">PIN incorreto. Tente novamente.</div>
+      </div>
+
+      <div id="admin-controls" class="locked">
+        <div class="adm-lists">
+          <div class="adm-list-box">
+            <div class="adm-list-head">
+              <span class="badge-dot dot-blue"></span>
+              <span>Pendentes</span>
+              <span class="adm-count" id="adm-pend-count">0</span>
+            </div>
+            <div class="add-row">
+              <input type="text" id="add-pending-input" placeholder="Nome do cliente" onkeydown="if(event.key==='Enter')addClient('pending')" />
+              <button class="btn btn-green" onclick="addClient('pending')"><i class="ti ti-plus"></i></button>
+            </div>
+            <div class="adm-scroll" id="adm-pending-list"></div>
+          </div>
+
+          <div class="adm-list-box">
+            <div class="adm-list-head">
+              <span class="badge-dot dot-green"></span>
+              <span>Migrados</span>
+              <span class="adm-count green" id="adm-done-count">0</span>
+            </div>
+            <div class="add-row">
+              <input type="text" id="add-done-input" placeholder="Nome do cliente" onkeydown="if(event.key==='Enter')addClient('done')" />
+              <button class="btn btn-green" onclick="addClient('done')"><i class="ti ti-plus"></i></button>
+            </div>
+            <div class="adm-scroll" id="adm-done-list"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const PIN = "DJJJKLVR";
+let currentTab = "pendentes";
+let state = { pending: [], done: [], updatedAt: null };
+
+document.getElementById("topbar-date").textContent = new Date().toLocaleDateString("pt-BR", { weekday:"long", day:"2-digit", month:"long", year:"numeric" });
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem("migration_avanco");
+    if (saved) state = JSON.parse(saved);
+  } catch(e) {}
+  render();
+}
+
+function saveState() {
+  state.updatedAt = new Date().toISOString();
+  try { localStorage.setItem("migration_avanco", JSON.stringify(state)); } catch(e) {}
+  render();
+}
+
+function render() {
+  const pending = (state.pending || []).length;
+  const done = (state.done || []).length;
+  const total = pending + done;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+
+  document.getElementById("total-display").textContent = total;
+  document.getElementById("done-display").textContent = done;
+  document.getElementById("pending-display").textContent = pending;
+  document.getElementById("pct-display").textContent = pct + "%";
+  document.getElementById("bar").style.width = pct + "%";
+
+  if (state.updatedAt) {
+    const d = new Date(state.updatedAt);
+    const fmt = d.toLocaleString("pt-BR", { day:"2-digit", month:"2-digit", year:"numeric", hour:"2-digit", minute:"2-digit" });
+    document.getElementById("last-update").innerHTML = '<span class="ts-dot"></span>Última atualização: ' + fmt;
+  }
+
+  renderList();
+  renderAdminLists();
+}
+
+function renderList() {
+  const q = (document.getElementById("search-input").value || "").toLowerCase();
+  const items = currentTab === "pendentes" ? (state.pending || []) : (state.done || []);
+  const filtered = q ? items.filter(n => n.toLowerCase().includes(q)) : items;
+  const el = document.getElementById("list-view");
+  const dotClass = currentTab === "pendentes" ? "dot-blue" : "dot-green";
+
+  if (!filtered.length) {
+    el.innerHTML = '<div class="empty-state">' + (q ? 'Nenhum resultado para "' + esc(q) + '"' : (currentTab === "pendentes" ? "Nenhum cliente pendente cadastrado." : "Nenhum cliente migrado cadastrado.")) + '</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(n => '<div class="list-row"><span class="badge-dot ' + dotClass + '"></span>' + esc(n) + '</div>').join("");
+}
+
+function renderAdminLists() {
+  const p = state.pending || [], d = state.done || [];
+  document.getElementById("adm-pend-count").textContent = p.length;
+  document.getElementById("adm-done-count").textContent = d.length;
+
+  document.getElementById("adm-pending-list").innerHTML = p.length
+    ? p.map((n, i) => '<div class="adm-item"><span class="iname">' + esc(n) + '</span><button onclick="removeClient(\'pending\',' + i + ')">remover</button></div>').join("")
+    : '<div style="padding:12px 14px;font-size:13px;color:#7A90A4">Nenhum cadastrado ainda.</div>';
+
+  document.getElementById("adm-done-list").innerHTML = d.length
+    ? d.map((n, i) => '<div class="adm-item"><span class="iname">' + esc(n) + '</span><button onclick="removeClient(\'done\',' + i + ')">remover</button></div>').join("")
+    : '<div style="padding:12px 14px;font-size:13px;color:#7A90A4">Nenhum cadastrado ainda.</div>';
+}
+
+function addClient(list) {
+  const id = list === "pending" ? "add-pending-input" : "add-done-input";
+  const val = document.getElementById(id).value.trim();
+  if (!val) return;
+  if (!state[list]) state[list] = [];
+  state[list].push(val);
+  document.getElementById(id).value = "";
+  saveState();
+}
+
+function removeClient(list, idx) {
+  state[list].splice(idx, 1);
+  saveState();
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById("tab-pendentes").className = "tab" + (tab === "pendentes" ? " active" : "");
+  document.getElementById("tab-migrados").className = "tab" + (tab === "migrados" ? " active" : "");
+  document.getElementById("search-input").value = "";
+  renderList();
+}
+
+function checkPin() {
+  if (document.getElementById("pin-input").value === PIN) {
+    document.getElementById("admin-controls").classList.remove("locked");
+    document.getElementById("pin-section").style.display = "none";
+  } else {
+    document.getElementById("pin-error").style.display = "block";
+  }
+}
+
+document.getElementById("toggle-admin").addEventListener("click", () => {
+  const area = document.getElementById("admin-area");
+  const ch = document.getElementById("chevron");
+  const open = area.style.display === "block";
+  area.style.display = open ? "none" : "block";
+  ch.className = open ? "ti ti-chevron-down" : "ti ti-chevron-up";
+});
+
+function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+
+loadState();
+</script>
+</body>
+</html>
