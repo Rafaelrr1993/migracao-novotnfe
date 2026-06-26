@@ -39,6 +39,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .dot-blue { background: #378ADD; }
 .dot-green { background: #43A047; }
 .empty-state { padding: 28px; text-align: center; font-size: 14px; color: #7A90A4; }
+.loading-state { padding: 28px; text-align: center; font-size: 14px; color: #7A90A4; }
 .timestamp { font-size: 12px; color: #7A90A4; text-align: right; margin-top: 12px; display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
 .ts-dot { width: 7px; height: 7px; border-radius: 50%; background: #43A047; }
 .divider { border: none; border-top: 0.5px solid #DDE8F5; margin: 20px 0; }
@@ -56,6 +57,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .btn-green { background: #E8F5E9; color: #2E7D32; border-color: #A5D6A7; }
 .btn-green:hover { background: #C8E6C9; }
 .locked { opacity: 0.3; pointer-events: none; }
+.saving { opacity: 0.6; }
 .adm-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
 .adm-list-box { border: 0.5px solid #DDE8F5; border-radius: 10px; overflow: hidden; background: #F4F8FF; }
 .adm-list-head { padding: 10px 14px; background: #fff; border-bottom: 0.5px solid #DDE8F5; display: flex; align-items: center; gap: 8px; }
@@ -71,6 +73,9 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .adm-item .iname { flex: 1; }
 .adm-item button { padding: 3px 9px; font-size: 12px; border-radius: 6px; border: 0.5px solid #DDE8F5; background: transparent; cursor: pointer; color: #7A90A4; font-family: inherit; }
 .adm-item button:hover { background: #FFEBEE; color: #C62828; border-color: #FFCDD2; }
+.sync-status { font-size: 12px; color: #7A90A4; margin-top: 10px; text-align: center; }
+.sync-status.ok { color: #2E7D32; }
+.sync-status.err { color: #C62828; }
 @media (max-width: 500px) {
   .cards { grid-template-columns: 1fr 1fr; }
   .adm-lists { grid-template-columns: 1fr; }
@@ -121,7 +126,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
   <input type="text" class="search-input" id="search-input" placeholder="Buscar cliente pelo nome..." oninput="renderList()" />
 
-  <div class="list-box" id="list-view"></div>
+  <div class="list-box" id="list-view"><div class="loading-state">Carregando dados...</div></div>
   <div class="timestamp" id="last-update"></div>
 
   <div class="divider"></div>
@@ -172,6 +177,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
             <div class="adm-scroll" id="adm-done-list"></div>
           </div>
         </div>
+        <div class="sync-status" id="sync-status"></div>
       </div>
     </div>
   </div>
@@ -179,23 +185,46 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 
 <script>
 const PIN = "DJJJKLVR";
+const API = "https://script.google.com/macros/s/AKfycbwTcjTQp04-J7caPMtpgjGcAGjsawY3Ycw2OSl6kXBoUGuKzH6lDlbFT5DpTRrTUBCrUg/exec";
+
 let currentTab = "pendentes";
-let state = { pending: [], done: [], updatedAt: null };
+let state = { pending: [], done: [] };
 
 document.getElementById("topbar-date").textContent = new Date().toLocaleDateString("pt-BR", { weekday:"long", day:"2-digit", month:"long", year:"numeric" });
 
-function loadState() {
+async function loadFromSheet() {
   try {
-    const saved = localStorage.getItem("migration_avanco");
-    if (saved) state = JSON.parse(saved);
-  } catch(e) {}
-  render();
+    const res = await fetch(API);
+    const data = await res.json();
+    state.pending = data.pending || [];
+    state.done = data.done || [];
+    state.updatedAt = new Date().toISOString();
+    render();
+  } catch(e) {
+    document.getElementById("list-view").innerHTML = '<div class="empty-state">Erro ao carregar dados. Verifique a conexão.</div>';
+  }
 }
 
-function saveState() {
-  state.updatedAt = new Date().toISOString();
-  try { localStorage.setItem("migration_avanco", JSON.stringify(state)); } catch(e) {}
-  render();
+async function saveToSheet() {
+  const status = document.getElementById("sync-status");
+  status.textContent = "Salvando...";
+  status.className = "sync-status";
+  try {
+    await fetch(API, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ pending: state.pending, done: state.done })
+    });
+    state.updatedAt = new Date().toISOString();
+    status.textContent = "Salvo com sucesso!";
+    status.className = "sync-status ok";
+    setTimeout(() => { status.textContent = ""; }, 3000);
+    render();
+  } catch(e) {
+    status.textContent = "Erro ao salvar. Tente novamente.";
+    status.className = "sync-status err";
+  }
 }
 
 function render() {
@@ -255,12 +284,12 @@ function addClient(list) {
   if (!state[list]) state[list] = [];
   state[list].push(val);
   document.getElementById(id).value = "";
-  saveState();
+  saveToSheet();
 }
 
 function removeClient(list, idx) {
   state[list].splice(idx, 1);
-  saveState();
+  saveToSheet();
 }
 
 function switchTab(tab) {
@@ -290,7 +319,8 @@ document.getElementById("toggle-admin").addEventListener("click", () => {
 
 function esc(s) { return s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
 
-loadState();
+loadFromSheet();
+setInterval(loadFromSheet, 30000);
 </script>
 </body>
 </html>
