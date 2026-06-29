@@ -26,20 +26,21 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .bar-row strong { font-size: 20px; font-weight: 500; color: #1565C0; }
 .bar-bg { background: #E3F0FF; border-radius: 999px; height: 12px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 999px; background: #43A047; transition: width 0.6s ease; }
-.tabs { display: flex; margin-bottom: 14px; background: #fff; border: 0.5px solid #DDE8F5; border-radius: 10px; overflow: hidden; }
-.tab { flex: 1; padding: 10px 14px; font-size: 14px; font-family: inherit; border: none; cursor: pointer; background: transparent; color: #7A90A4; transition: all 0.15s; display: flex; align-items: center; justify-content: center; gap: 6px; }
-.tab:not(:last-child) { border-right: 0.5px solid #DDE8F5; }
-.tab.active { background: #1565C0; color: #fff; font-weight: 500; }
+.search-label { font-size: 13px; color: #3A5068; margin-bottom: 8px; }
 .search-input { width: 100%; height: 38px; padding: 0 14px; background: #fff; border: 0.5px solid #DDE8F5; border-radius: 8px; font-size: 14px; color: #0D2340; outline: none; font-family: inherit; margin-bottom: 12px; }
 .search-input::placeholder { color: #7A90A4; }
 .list-box { background: #fff; border-radius: 12px; border: 0.5px solid #DDE8F5; overflow: hidden; min-height: 80px; }
 .list-row { display: flex; align-items: center; padding: 11px 16px; border-bottom: 0.5px solid #DDE8F5; font-size: 14px; color: #0D2340; gap: 10px; }
 .list-row:last-child { border-bottom: none; }
-.badge-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 500; }
+.badge-pending { background: #E3F0FF; color: #1565C0; }
+.badge-done { background: #E8F5E9; color: #2E7D32; }
+.badge-dot { width: 7px; height: 7px; border-radius: 50%; }
 .dot-blue { background: #378ADD; }
 .dot-green { background: #43A047; }
-.empty-state { padding: 28px; text-align: center; font-size: 14px; color: #7A90A4; }
-.loading-state { padding: 28px; text-align: center; font-size: 14px; color: #7A90A4; }
+.hint-state { padding: 24px 16px; text-align: center; font-size: 14px; color: #7A90A4; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.hint-state i { font-size: 28px; color: #B5D4F4; }
+.empty-state { padding: 24px; text-align: center; font-size: 14px; color: #7A90A4; }
 .timestamp { font-size: 12px; color: #7A90A4; text-align: right; margin-top: 12px; display: flex; align-items: center; justify-content: flex-end; gap: 5px; }
 .ts-dot { width: 7px; height: 7px; border-radius: 50%; background: #43A047; }
 .divider { border: none; border-top: 0.5px solid #DDE8F5; margin: 20px 0; }
@@ -57,7 +58,13 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .btn-green { background: #E8F5E9; color: #2E7D32; border-color: #A5D6A7; }
 .btn-green:hover { background: #C8E6C9; }
 .locked { opacity: 0.3; pointer-events: none; }
-.saving { opacity: 0.6; }
+.adm-counters { background: #F4F8FF; border: 0.5px solid #DDE8F5; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+.adm-counters h3 { font-size: 13px; font-weight: 500; color: #3A5068; margin-bottom: 10px; }
+.counter-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; color: #3A5068; }
+.counter-row:last-child { margin-bottom: 0; }
+.counter-row label { width: 130px; }
+.counter-row input { width: 80px; height: 30px; padding: 0 10px; border: 0.5px solid #DDE8F5; border-radius: 6px; font-size: 14px; font-family: inherit; outline: none; text-align: center; }
+.counters-note { font-size: 12px; color: #7A90A4; margin-top: 8px; }
 .adm-lists { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 16px; }
 .adm-list-box { border: 0.5px solid #DDE8F5; border-radius: 10px; overflow: hidden; background: #F4F8FF; }
 .adm-list-head { padding: 10px 14px; background: #fff; border-bottom: 0.5px solid #DDE8F5; display: flex; align-items: center; gap: 8px; }
@@ -73,7 +80,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 .adm-item .iname { flex: 1; }
 .adm-item button { padding: 3px 9px; font-size: 12px; border-radius: 6px; border: 0.5px solid #DDE8F5; background: transparent; cursor: pointer; color: #7A90A4; font-family: inherit; }
 .adm-item button:hover { background: #FFEBEE; color: #C62828; border-color: #FFCDD2; }
-.sync-status { font-size: 12px; color: #7A90A4; margin-top: 10px; text-align: center; }
+.sync-status { font-size: 12px; color: #7A90A4; margin-top: 10px; text-align: center; min-height: 18px; }
 .sync-status.ok { color: #2E7D32; }
 .sync-status.err { color: #C62828; }
 @media (max-width: 500px) {
@@ -94,39 +101,35 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <div class="body">
   <div class="cards">
     <div class="stat-card">
-      <div class="slabel">Total de lojas</div>
-      <div class="sval blue" id="total-display">—</div>
+      <div class="slabel">Total de clientes</div>
+      <div class="sval blue" id="total-display">286</div>
     </div>
     <div class="stat-card">
-      <div class="slabel">Migradas</div>
-      <div class="sval green" id="done-display">—</div>
+      <div class="slabel">Migrados</div>
+      <div class="sval green" id="done-display">156</div>
     </div>
     <div class="stat-card">
       <div class="slabel">Pendentes</div>
-      <div class="sval orange" id="pending-display">—</div>
+      <div class="sval orange" id="pending-display">130</div>
     </div>
   </div>
 
   <div class="bar-card">
     <div class="bar-row">
       <span>Progresso geral da migração</span>
-      <strong id="pct-display">0%</strong>
+      <strong id="pct-display">55%</strong>
     </div>
-    <div class="bar-bg"><div class="bar-fill" id="bar" style="width:0%"></div></div>
+    <div class="bar-bg"><div class="bar-fill" id="bar" style="width:55%"></div></div>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('pendentes')" id="tab-pendentes">
-      <i class="ti ti-clock"></i> Pendentes
-    </button>
-    <button class="tab" onclick="switchTab('migrados')" id="tab-migrados">
-      <i class="ti ti-circle-check"></i> Migrados
-    </button>
+  <div class="search-label">Consultar situação de um cliente</div>
+  <input type="text" class="search-input" id="search-input" placeholder="Digite o nome do cliente para verificar a situação..." oninput="renderList()" />
+  <div class="list-box" id="list-view">
+    <div class="hint-state">
+      <i class="ti ti-search"></i>
+      <span>Digite o nome do cliente para consultar a situação</span>
+    </div>
   </div>
-
-  <input type="text" class="search-input" id="search-input" placeholder="Buscar cliente pelo nome..." oninput="renderList()" />
-
-  <div class="list-box" id="list-view"><div class="loading-state">Carregando dados...</div></div>
   <div class="timestamp" id="last-update"></div>
 
   <div class="divider"></div>
@@ -150,6 +153,20 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
       </div>
 
       <div id="admin-controls" class="locked">
+        <div class="adm-counters">
+          <h3>Atualizar contadores gerais</h3>
+          <div class="counter-row">
+            <label>Total de clientes</label>
+            <input type="number" id="input-total" value="286" min="0" />
+            <button class="btn btn-blue" onclick="saveCounters()">Salvar</button>
+          </div>
+          <div class="counter-row">
+            <label>Já migrados</label>
+            <input type="number" id="input-done" value="156" min="0" />
+          </div>
+          <div class="counters-note">Os cards e a barra atualizam automaticamente ao salvar.</div>
+        </div>
+
         <div class="adm-lists">
           <div class="adm-list-box">
             <div class="adm-list-head">
@@ -188,7 +205,7 @@ const PIN = "DJJJKLVR";
 const API = "https://script.google.com/macros/s/AKfycbwTcjTQp04-J7caPMtpgjGcAGjsawY3Ycw2OSl6kXBoUGuKzH6lDlbFT5DpTRrTUBCrUg/exec";
 
 let currentTab = "pendentes";
-let state = { pending: [], done: [] };
+let state = { pending: [], done: [], total: 286, migrados: 156, updatedAt: null };
 
 document.getElementById("topbar-date").textContent = new Date().toLocaleDateString("pt-BR", { weekday:"long", day:"2-digit", month:"long", year:"numeric" });
 
@@ -198,39 +215,47 @@ async function loadFromSheet() {
     const data = await res.json();
     state.pending = data.pending || [];
     state.done = data.done || [];
+    if (data.total !== undefined) state.total = data.total;
+    if (data.migrados !== undefined) state.migrados = data.migrados;
     state.updatedAt = new Date().toISOString();
     render();
-  } catch(e) {
-    document.getElementById("list-view").innerHTML = '<div class="empty-state">Erro ao carregar dados. Verifique a conexão.</div>';
-  }
+  } catch(e) {}
 }
 
 async function saveToSheet() {
-  const status = document.getElementById("sync-status");
-  status.textContent = "Salvando...";
-  status.className = "sync-status";
+  setSyncStatus("Salvando...", "");
   try {
     await fetch(API, {
       method: "POST",
       mode: "no-cors",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ pending: state.pending, done: state.done })
+      body: JSON.stringify({ pending: state.pending, done: state.done, total: state.total, migrados: state.migrados })
     });
     state.updatedAt = new Date().toISOString();
-    status.textContent = "Salvo com sucesso!";
-    status.className = "sync-status ok";
-    setTimeout(() => { status.textContent = ""; }, 3000);
+    setSyncStatus("Salvo com sucesso!", "ok");
+    setTimeout(() => setSyncStatus("", ""), 3000);
     render();
   } catch(e) {
-    status.textContent = "Erro ao salvar. Tente novamente.";
-    status.className = "sync-status err";
+    setSyncStatus("Erro ao salvar. Tente novamente.", "err");
   }
 }
 
+function setSyncStatus(msg, cls) {
+  const el = document.getElementById("sync-status");
+  el.textContent = msg;
+  el.className = "sync-status" + (cls ? " " + cls : "");
+}
+
+function saveCounters() {
+  state.total = parseInt(document.getElementById("input-total").value) || 0;
+  state.migrados = parseInt(document.getElementById("input-done").value) || 0;
+  saveToSheet();
+}
+
 function render() {
-  const pending = (state.pending || []).length;
-  const done = (state.done || []).length;
-  const total = pending + done;
+  const total = state.total || 0;
+  const done = state.migrados || 0;
+  const pending = Math.max(total - done, 0);
   const pct = total > 0 ? Math.round((done / total) * 100) : 0;
 
   document.getElementById("total-display").textContent = total;
@@ -238,6 +263,8 @@ function render() {
   document.getElementById("pending-display").textContent = pending;
   document.getElementById("pct-display").textContent = pct + "%";
   document.getElementById("bar").style.width = pct + "%";
+  document.getElementById("input-total").value = total;
+  document.getElementById("input-done").value = done;
 
   if (state.updatedAt) {
     const d = new Date(state.updatedAt);
@@ -250,17 +277,32 @@ function render() {
 }
 
 function renderList() {
-  const q = (document.getElementById("search-input").value || "").toLowerCase();
-  const items = currentTab === "pendentes" ? (state.pending || []) : (state.done || []);
-  const filtered = q ? items.filter(n => n.toLowerCase().includes(q)) : items;
+  const q = (document.getElementById("search-input").value || "").trim().toLowerCase();
   const el = document.getElementById("list-view");
-  const dotClass = currentTab === "pendentes" ? "dot-blue" : "dot-green";
 
-  if (!filtered.length) {
-    el.innerHTML = '<div class="empty-state">' + (q ? 'Nenhum resultado para "' + esc(q) + '"' : (currentTab === "pendentes" ? "Nenhum cliente pendente cadastrado." : "Nenhum cliente migrado cadastrado.")) + '</div>';
+  // Sem busca: mostra dica, não mostra nomes
+  if (!q) {
+    el.innerHTML = '<div class="hint-state"><i class="ti ti-search"></i><span>Digite o nome do cliente para consultar a situação</span></div>';
     return;
   }
-  el.innerHTML = filtered.map(n => '<div class="list-row"><span class="badge-dot ' + dotClass + '"></span>' + esc(n) + '</div>').join("");
+
+  const allPending = (state.pending || []).filter(n => n.toLowerCase().includes(q));
+  const allDone = (state.done || []).filter(n => n.toLowerCase().includes(q));
+  const total = allPending.length + allDone.length;
+
+  if (!total) {
+    el.innerHTML = '<div class="empty-state">Nenhum cliente encontrado para "<strong>' + esc(q) + '</strong>".</div>';
+    return;
+  }
+
+  let html = "";
+  allDone.forEach(n => {
+    html += '<div class="list-row">' + esc(n) + '<span class="badge badge-done"><span class="badge-dot dot-green"></span>Migrado</span></div>';
+  });
+  allPending.forEach(n => {
+    html += '<div class="list-row">' + esc(n) + '<span class="badge badge-pending"><span class="badge-dot dot-blue"></span>Pendente</span></div>';
+  });
+  el.innerHTML = html;
 }
 
 function renderAdminLists() {
@@ -290,14 +332,6 @@ function addClient(list) {
 function removeClient(list, idx) {
   state[list].splice(idx, 1);
   saveToSheet();
-}
-
-function switchTab(tab) {
-  currentTab = tab;
-  document.getElementById("tab-pendentes").className = "tab" + (tab === "pendentes" ? " active" : "");
-  document.getElementById("tab-migrados").className = "tab" + (tab === "migrados" ? " active" : "");
-  document.getElementById("search-input").value = "";
-  renderList();
 }
 
 function checkPin() {
